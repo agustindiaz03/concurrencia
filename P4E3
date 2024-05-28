@@ -1,0 +1,37 @@
+
+
+
+
+Process Vendedores[id:0..2] {
+  while(true) {
+    recieve
+    send comida[](c);
+
+  }
+}
+
+Process Cocineros[id:0..1] {
+
+  while(true) {
+
+
+  }
+
+}
+
+Process Clientes[id:0..C-1] {
+  send espera(id);
+  recieve comida[id](c);
+
+}
+
+
+Process Coordinador {
+
+  while(true) {
+
+
+  }
+
+
+}
