@@ -1,1 +1,45 @@
+Chan llegada(int);
+Chan numero[P](int);
+Chan espera[5](int);
+Chan comprobante[P](Comprobante);
+
+
+Process Caja[id:0..4] {
+  while (true) {
+    int idP;
+    recieve espera[id](idP);
+    Comprobante c = generarComprobante();
+    send comprobante[idP](c);
+    send salida(id);
+  }
+  
+
+}
+
+Process Personas[id:0..P-1] {
+  int micaja;
+  Comprobante micomprobante;
+
+  send llegada(id);
+  recieve numero[id](micaja);
+  send espera[micaja](id);
+  recieve comprobante[id](micomprobante);
+
+}
+
+Process Coordinador {  
+  int contador [5] = ([5], 0);
+  if(!empty(llegada)) {
+    recieve llegada(idP);
+    int menor = min(contador);
+    send numero[idP](menor);
+    contador[menor]++;
+  }
+  if (!empty(salida)) {
+			int idC;
+			receive salida(idC);
+			contador[idC]--;
+		}
+
+}
 
