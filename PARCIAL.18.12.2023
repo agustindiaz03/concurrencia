@@ -1,0 +1,52 @@
+Cola c;
+sem mutex = 1, vacio = 0 , repuesto = 0 , espera[U] = {[U] 0} ;
+boolean ocupada = false;
+int latas = 100,idS;
+Process Usuarios[id:0..U-1] {
+  P(mutex);
+  if (ocupada) {
+    push(c,id);
+    V(mutex);
+    P(espera[id])
+  } 
+  else {
+    ocupada = true;
+    V(mutex);
+  }
+  // entro
+  if (latas == 0) {
+    V(vacio)
+    P(repuesto)
+  }
+  latas = latas - 1;
+
+  P(mutex);
+  if (empty(c)) ocupada = false;
+  else {
+    pop(c,idS);
+    V(espera[idS]);
+  }
+  V(mutex);
+
+  
+}
+
+Process Repositor {
+  while (true) {
+    P(vacio);
+    latas = 100;
+    V(repuesto);
+
+  }
+
+}
+
+
+
+
+
+
+
+
+
+
