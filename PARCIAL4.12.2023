@@ -1,0 +1,69 @@
+Cola transacciones;
+sem mutex = 1, sem_cont[10] = {[10] 1}, salida = 1, dormir = 1
+int cont[10] = {[10] 0}, cant = 0, i;
+Process workers[id:0..6] {
+
+  P(mutex);
+  while (not empty(transacciones)) do 
+    t = pop(transacciones);
+    V(mutex);
+    res_val = validar(t);
+    
+    P(sem_cont[res_val]);
+    cont[res_val]++;
+    V(sem_cont[res_val]);
+
+    P(mutex);
+  end;
+  V(mutex);
+
+  P(salida);
+  cant = cant + 1;
+  if(cant < 7) {
+    V(salida);
+    P(dormir)
+  } else {
+    for i:=0 to 9 do print(i,contadores[i]);
+    for i:=0 to 5 do V(dormir);
+    V(salida);
+
+  }
+}
+
+
+
+
+
+
+Process Vendedores[id:0..19] {
+  int e,v,t;
+  Equipos[e].llegada();
+  Equipos[e].ventas(v);
+  Equipos[e].total(t);
+}
+
+
+Monitor Equipos[id:0..4] {
+  cond espera = 0,dormir; 
+  int cant = 0, totalVentas = 0 , salida = 0;
+  procedure llegada() {
+    cant++;
+    if(cant == 4) signal_all(espera) 
+    else wait(espera);
+  }
+
+  procedure ventas(v:in int) {
+    salida = salida + 1;
+    totalVentas = totalVentas + v;
+  }
+
+  procedure total(t:out int) {
+    if (salida < 4) wait(dormir)
+    else signal_all(dormir);
+    t = totalVentas;
+    
+  }
+/// SE PODRIA JUNTAR VENTAS Y TOTAL
+}
+
+
