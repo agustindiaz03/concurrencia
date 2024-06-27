@@ -1,0 +1,78 @@
+sem mutex = 1, platoListo = 0, espacios = P;
+
+Process Cocineros[id:0..C-1] {
+
+  while(true) {
+    // prepara
+    P(espacios); // espera a que haya lugar
+    P(mutex);
+    // pongo la bandeja
+    V(mutex);
+    V(platoListo);
+    
+  }
+
+}
+
+Process Mozos[id:0..M-1] {
+
+  while(true) {
+    P(platoListo); // espera
+    
+    P(mutex);
+    //agarra el plato
+    
+    V(mutex);
+    V(espacios);
+    // reparte
+
+  }
+
+}
+
+
+
+Process vehiculos[id:0..74] {
+  int p;
+  texto comprobante;
+  Admin[p].atencion(id,comprobante);
+
+}
+
+Procedure Planta[id:0..4] {
+  int idV;
+  texto comprobante;
+  while(true) {
+    Admin[id].siguiente(idV);
+    comprobante = generar(idV);
+    Admin[id].comprobante(comprobante);
+  }
+}
+
+Monitor Admin[id:0..4] {
+  Cola c;
+  texto comp;
+  cond estoy,espera_C,final;
+
+  procedure atencion(idV:in int; texto co) {
+    push(c,idV);
+    signal(estoy);
+    wait(espera_C);
+    co = comp;
+    signal(final);
+  }
+
+  procedure siguiente(idV:out int) {
+    if(empty(c)) wait(estoy);
+    pop(c,idV);
+  }
+  
+  procedure comprobante(comprobante: in texto) {
+    comp = comprobante;
+    signal(espera_C)
+    wait(final);
+
+  }
+
+}
+
