@@ -1,6 +1,24 @@
 //// AWAIT
 
 
+  Process Personas[id:0..P-1] {
+    <push(C,id)>
+    <await(respuesta[id]==true)>
+
+
+  }
+
+  Process Boleterias[id:0..4] {
+
+    while (true) {
+      
+     
+    }
+
+  }
+
+ 
+
 
 ///// SEMAFOROS
   boolean ocupado = false;
@@ -33,7 +51,45 @@
 ///// MONITORES
 
   Process Controladores[id:0..14] {
-
-
+     int t,a;
+     while (true) {
+       t = medir();
+       Admin.medicion(id,t,a);
+       actuar(a);
+       delay();
+    }
   }
+
+  Process ModuloCentral {
+    int t;
+    while (true) {
+      Admin.siguiente(t);
+      s = determinar(t); 
+      Admin.solucion(s);
+    }
+  }
+
+
+  Monitor Admin {
+    int idC,sol;
+    cond alguien, espera[15];
+    Cola c;
+
+    procedure medicion(id: in int; t:in int; a:out int) {
+      push(C,(id,t));
+      signal(alguien);
+      wait(espera[id]);
+      a = sol;
+   }
+
+   procedure siguiente(t: out int) {
+     if(empty(C)) wait(alguien);
+     pop(C,(idC,t));
+   }
+
+   procedure solucion(s: in int) {
+     sol = s;
+     signal(espera[idC]);
+   }
+  } 
 
