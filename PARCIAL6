@@ -1,0 +1,102 @@
+
+
+///// AWAIT 
+int num; 
+boolean listo = false, ok=false;
+Cola c;
+
+Process Empleado {
+  int id;
+  for i:=1 to C do {
+    <pop(C,id);>
+    <await(ok);ok=false>
+    num = random();
+    listo = true;
+    <await(not listo);>
+
+  }
+
+}
+
+Process Clientes[id:0..C-1] {
+ <push(c,id);>
+ <await siguiente==id;>
+ ok = true;
+ <await( listo);>
+ print(num);
+ listo = false;
+}
+
+
+//// SEMAFOROS
+sem mutex = 1,espera=0,nota[50] = {[50] 0};
+int llegada=0;
+
+Process Alumnos[id:0..49] {
+  P(mutex);
+  llegada=llegada+1;
+  if(llegada==50) {
+    for i:=1 to 50 do V(espera);
+    V(mutex);
+  }
+  else {
+    V(mutex);
+    P(espera);
+  }
+  
+  // hacen el examen
+
+
+  P(mutex);
+  push(c,id);
+  V(terminarExamen);
+  V(mutex);
+  P(nota[id]);
+}
+
+
+Process Docente {
+  int i;
+  for i:=1 to 50 do {
+    P(terminarExamen);
+    P(mutex);
+    pop(c,id);
+    // corrijo
+    V(nota[id]);
+  }
+}
+
+
+//// MONITORES
+
+Process Personas[id:0..N-1] {
+  Admin.entrada();
+  // imprimiendo
+  Admin.salida();
+
+}
+
+
+Monitor Admin {
+  cond espera;
+  boolean ocupada = false;
+  int esperando=0;
+
+  procedure entrada() {
+    if (ocupada==true) {
+      esperando ++;
+      wait(espera);
+    }
+    else ocupada = true;
+  }
+
+  procedure salida() {
+    if(esperando > 0) {
+      esperando--;
+      signal(espera);
+    }
+    else ocupada = false;
+  }
+
+}
+
