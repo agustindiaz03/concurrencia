@@ -43,6 +43,38 @@ Process Repositor {
 
 
 
+Process escaladores[id:0..29] {
+ admin.llegada(id);
+ admin.salida();
+
+}
+
+
+Monitor Admin {
+  boolean alguien = false;
+  int contador=0;
+  cond espera;
+
+  procedure llegada(id: in int) {
+    if (alguien) {
+      contador++;
+      wait(espera);
+    }
+    else alguien = true;
+  }
+
+  procedure salida() {
+    if (contador > 0)) {
+      contador--;
+      signal(espera);
+    }
+    else alguien = false;
+  }
+
+}
+
+
+
 
 
 
