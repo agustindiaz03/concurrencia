@@ -1,0 +1,65 @@
+int grupo = 0,llegada = 0,contador[10] = {[10] 0};
+sem espera[10] = {[10] 0}, mutex=1, mutexG[10] = {[10] 1};
+
+Process Empleados[id:0..49] {
+  int miGrupo;
+  P(mutex);
+  miGrupo = grupo;
+  llegada ++;
+  if (llegada == 5) { //grupo completo
+    grupo=grupo+1;
+    for i:=1 to 4 do V(espera[miGrupo]);
+    llegada = 0;
+    V(mutex);
+  }
+  else {
+    V(mutex);
+    wait(espera[miGrupo]);
+ }
+ // armo un mueble
+ P(mutexG[miGrupo]);
+ while (contador[miGrupo] < M) {
+   contador[miGrupo]++;
+   V(mutexG[miGrupo]);
+   // armo un mueble
+   P(mutexG[miGrupo]);
+ }
+ V(mutexG[miGrupo]);
+ 
+
+
+}
+
+
+
+
+Process Estudiantes[id:0..E-1] {
+  Horno.llegada();
+  // usando el horno
+  Horno.salida();
+}
+
+
+Monitor Horno {
+  cond espera;
+  boolean libre = true;
+  int esperando = 0;
+
+  procedure llegada() {
+    if(not libre) {
+      esperando++;
+      wait(espera);
+    } else libre = false;
+
+  }
+
+  procedure salida() {
+    if(esperando > 0) {
+      signal(espera);
+      esperando --;
+    }
+    else libre = true;
+
+  }
+
+}
