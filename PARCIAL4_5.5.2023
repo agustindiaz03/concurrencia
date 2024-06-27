@@ -1,0 +1,39 @@
+//// AWAIT
+
+
+
+///// SEMAFOROS
+  boolean ocupado = false;
+
+  Process Autos[id:0..N-1] {
+    P(mutex);
+    if(ocupado==true) {
+      push(C,id);
+      V(mutex);
+      P(espera[id]);
+    } 
+    else {
+      ocupado = true;
+      V(mutex);
+    }
+
+    Pasar()
+
+    P(mutex);
+    if (empty(C)) ocupado = false;
+    else {
+      pop(C,idS);
+      V(espera[idS]);
+    }
+    V(mutex);
+
+  }
+
+
+///// MONITORES
+
+  Process Controladores[id:0..14] {
+
+
+  }
+
